@@ -5,12 +5,19 @@ var Chunk = require('./chunk')
 
 var version = '__VERSION__'
 
+var isServer = typeof window === 'undefined'
+
 // ie10+
-var ie10plus = window.navigator.msPointerEnabled
+var ie10plus = isServer ? false : window.navigator.msPointerEnabled
 var support = (function () {
   var sliceName = 'slice'
-  var _support = utils.isDefined(window.File) && utils.isDefined(window.Blob) &&
-                utils.isDefined(window.FileList)
+
+  var _support = false
+  if (!isServer) {
+    _support = utils.isDefined(window.File) && utils.isDefined(window.Blob) &&
+                  utils.isDefined(window.FileList)
+  }
+
   var bproto = null
   if (_support) {
     bproto = window.Blob.prototype
@@ -28,6 +35,7 @@ var support = (function () {
 })()
 
 var supportDirectory = (function () {
+  if (isServer) return null
   var input = window.document.createElement('input')
   input.type = 'file'
   var sd = 'webkitdirectory' in input || 'directory' in input
